@@ -30,7 +30,7 @@ public class Snake {
     
 
     // Eats methods (add point in same position on last point pre-update)
-    private void eats () {
+    public void eats () {
         Point p = new Point(body.get(body.size()-1));
         body.add(p);
     }

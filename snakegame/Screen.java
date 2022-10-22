@@ -1,6 +1,6 @@
 // Class to rendering data model with snake game
 
-package snake;
+package snakegame;
 import javax.swing.JFrame;
 
 /**

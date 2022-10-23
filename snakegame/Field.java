@@ -15,17 +15,17 @@ public class Field {
     // Builders
     public Field (int size, int nfood) {
         this.size = size;
-        snake = new Snake(new Point(4, (size-1)/2), Snake.Direction.RIGHT); // size is shots
+        snake = new Snake(new Point(4, (size-1)/2), Snake.Direction.RIGHT, size); // size is shots
         foodManager = new FoodManager(nfood);
+        foodFiller();
     }
 
-    // Init methods to start game
-    // Manege snake and random food point and check
-    public void init () {
+    // Method to fill food on the field
+    public void foodFiller () {
         // Genarete foods
         while (true) {
-           int x = (int) (Math.random() * (this.size + 1));
-           int y = (int) (Math.random() * (this.size + 1));
+           int x = (int) (Math.random() * (this.size));
+           int y = (int) (Math.random() * (this.size));
            Point p = new Point(x, y);
            
            if (!snake.isBusy(p) && !foodManager.isBusy(p)) foodManager.insertFood(p);
@@ -35,12 +35,16 @@ public class Field {
 
     // Build matrix field to pass a rendering obj
     public int[][] buildMatrixField () {
+        Point snakeHead = snake.getBody().get(0);
         int[][] matrix = new int[size][size];
         
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 Point p = new Point(j, i);
-                if (snake.isBusy(p))            matrix[i][j] = 1;
+                if (snake.isBusy(p)){
+                    if (snakeHead.distance(p) == 0) matrix[i][j] = 3;
+                    else matrix[i][j] = 1;
+                }
                 else if (foodManager.isBusy(p)) matrix[i][j] = 2;
                 else matrix[i][j] = 0;
             }
@@ -48,6 +52,18 @@ public class Field {
         return matrix;
     }
 
+    // Method to check if snake superimposed on an apple
+    public void checkSuperimposedAllPoint () {
+        for (Point food : foodManager.getFoods()) {
+            if (snake.isBusy(food) && foodManager.isBusy(food)) {
+                snake.eats();                   // Snake growth
+                foodManager.removeFood(food);   // Removal of eaten apple
+                foodFiller();                   // Generate new apple and fill food max gap
+                break;
+            }
+        }
+    }
+    
     // Getter & Setter
     public Snake getSnake() { return snake; }
     public void setSnake(Snake snake) { this.snake = snake; }

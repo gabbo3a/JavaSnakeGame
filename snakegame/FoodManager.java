@@ -13,7 +13,6 @@ public class FoodManager {
     private int max;
     private ArrayList<Point> foods;
     
-    
     // Bulders
     public FoodManager (int max) {
         this.max = max;
@@ -42,4 +41,9 @@ public class FoodManager {
         }
         return false;
     }
+    
+    
+    // Getter & Setter
+    public ArrayList<Point> getFoods() { return foods; }
+    
 }

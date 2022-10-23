@@ -10,15 +10,15 @@ import java.util.ArrayList;
 public class Snake {
     // Definitions
     enum Direction {TOP, RIGHT, BOTTOM, LEFT, NULL }
-    // public record SnakePoint (Point p, Point oldP) {} 
     
     // Data
-    // private SnakePoint head;
+    private int fieldSize;
     private Direction direction = Direction.RIGHT;
     private ArrayList<Point> body; // Snake body 
     
     // Bulders
-    public Snake(Point headPosition, Direction dir) {
+    public Snake(Point headPosition, Direction dir, int fieldSize) {
+        this.fieldSize = fieldSize;
         body = new ArrayList(10); // Allocate memory
    
         // Init head and small tail to start game
@@ -28,32 +28,12 @@ public class Snake {
         }
     }
     
-
     // Eats methods (add point in same position on last point pre-update)
     public void eats () {
-        Point p = new Point(body.get(body.size()-1));
-        body.add(p);
+        body.add(new Point(body.get(body.size()-1)));
     }
     
-    // [0] = head snake, [1-N] = tail
-    // Eats methods
-    // implemetare dimensioni  campoù
-    // implemetare blocchi (se sei TOP, no puoi BOTTOM ecc)
-    // ---------------------------------------------------------------------------------------------------------------------------------------------
-    private void check () {
-        
-        // NewPoint of Head 
-        // | implementare check
-        switch (direction) {
-            case TOP:    body.get(0).translate(0,-1); break;
-            case BOTTOM: body.get(0).translate(0, 1); break;
-            case LEFT:   body.get(0).translate(-1,0); break;
-            case RIGHT:  body.get(0).translate(1, 0); break;
-            // default: throw new AssertionError();
-        }
-    }
-    
-    // Methods to check if point p is busy by snake
+    // Method to check if point p is busy by snake
     public boolean isBusy (Point p) {
         for (Point snakePoint : body) {
             double distance = snakePoint.distance(p);
@@ -62,6 +42,19 @@ public class Snake {
         return false;
     }
 
+    // Method to check if next point is valid
+    private boolean check (Point nextPoint) {
+        // Check if the snake hit itself
+        for (Point point : body) 
+            if (point.distance(nextPoint) == 0) return false;
+        System.out.println();
+        // Check if snake out of scope
+        if (nextPoint.x < 0 || nextPoint.x >= fieldSize) return false;
+        if (nextPoint.y < 0 || nextPoint.y >= fieldSize) return false;
+        
+        return true;
+    }
+    
     // Methods to propagation points 
     private void propagation () {
         Point c1 = new Point(body.get(0)); // Save old head point
@@ -81,15 +74,38 @@ public class Snake {
     }
     
     // Methods to move snake
-    public void move () {
-        this.propagation();
-        this.check();
+    public boolean move () {
+        propagation();      // Propagation snake point
+       
+        // Check and move
+        Point next = (Point) body.get(0).clone();
+        switch (direction) {
+               case TOP:    next.translate(0,-1); break;
+               case BOTTOM: next.translate(0, 1); break;
+               case LEFT:   next.translate(-1,0); break;
+               case RIGHT:  next.translate(1, 0); break;
+        }
+        if (check(next)) {
+            body.set(0, next);
+            return true;
+        } 
+        else return false;
     }
     
     // Util method
     // Setter & Getter
     public Direction getDirection() { return direction; }
-    public void setDirection(Direction direction) { this.direction = direction; }
+    public void setDirection(Direction direction) {
+        
+        // Brutto da ripensare in modo piu carino
+        if (this.direction == Direction.TOP && direction == Direction.BOTTOM) return;
+        if (this.direction == Direction.RIGHT && direction == Direction.LEFT) return;
+        if (this.direction == Direction.BOTTOM && direction == Direction.TOP) return;
+        if (this.direction == Direction.LEFT && direction == Direction.RIGHT) return;
+        this.direction = direction; 
+    }
+    
+    public ArrayList<Point> getBody() { return body; }
 
     @Override
     public String toString() {

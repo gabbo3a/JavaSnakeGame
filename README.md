@@ -1,4 +1,5 @@
 # Java snake game
+Snake kills boredom, I didn't use a matrix
 
 ## Start
 <img src="asset/start.png" width="200" height="200" />
